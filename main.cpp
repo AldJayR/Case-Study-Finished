@@ -11,13 +11,15 @@ int main()
 {
     int money = 0;
     int priceSum = 0;
+    bool isDine = false;
+    bool newOrder = false;
 
     printOrderItems();
 
     string welcomeMeeting = "\nWelcome to Ardee's Canteen. Press 'Y' to get started. ";
     string orderingAgain = "\nPress 'Y' to continue: ";
 
-    orderSystem(welcomeMeeting);
+    orderSystem(welcomeMeeting, isDine, newOrder);
 
     checkCart(&priceSum);
 
@@ -28,7 +30,7 @@ int main()
     if (toupper(decision) != 'N')
     {
         checkout(&money, &priceSum);
-        printReceipt(&money);
+        printReceipt(&money, isDine);
         return 0;
     }
 
@@ -50,8 +52,9 @@ int main()
             updateItem();
             break;
         case 3:
+            newOrder = true;
             printOrderItems();
-            orderSystem(orderingAgain);
+            orderSystem(orderingAgain, isDine, newOrder);
             break;
         default:
             cout << "Invalid option! Select again";
@@ -67,7 +70,7 @@ int main()
     if (askCheckout())
     {
         checkout(&money, &priceSum);
-        printReceipt(&money);
+        printReceipt(&money, isDine);
     }
 
     return 0;

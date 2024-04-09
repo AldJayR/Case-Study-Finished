@@ -47,7 +47,7 @@ void printOrderItems()
 
 // Order prompt system
 
-void orderSystem(string orderMessage)
+void orderSystem(string orderMessage, bool &dine, bool &newOrder)
 {
     char prompt;
     cout << orderMessage;
@@ -57,6 +57,19 @@ void orderSystem(string orderMessage)
 
     while (toupper(prompt) != 'N')
     {
+        char order;
+        if (!newOrder && g_orderIndex == 0)
+        {
+            cout << "\nDine in or Take Out (D/T) ";
+            cin >> order;
+        }
+
+
+        if (toupper(order) != 'T')
+        {
+            dine = true;
+        }
+
         cout << "\nWhat would you like to order? (1-10) ";
         int item;
         cin >> item;
@@ -444,7 +457,7 @@ string getCurrentDateTime()
 
 // use int *money as a parameter here
 
-void printReceipt(int *money)
+void printReceipt(int *money, bool &dine)
 {
     string orderTime = getCurrentDateTime();
 
@@ -457,9 +470,12 @@ void printReceipt(int *money)
         cout << "|              " << orderTime << "                   |\n";
         cout << "|               San Antonio, Nueva Ecija                     |\n";
         cout << "|                   +63902020202                             |\n";
-        cout << "+------------------------------------------------------------|\n";
+        cout << "+------------------------------------------------------------+\n";
         cout << "| QTY    | ITEM                      | PRICE   |    TOTAL    |\n";
-        cout << "+------------------------------------------------------------|\n";
+        cout << "+------------------------------------------------------------+\n";
+        cout << "|                                                            |\n";
+        cout << "|-----------------------" << (dine ? "DINE IN-" : "TAKE OUT") << "-----------------------------|\n";
+        cout << "|                                                            |\n";
 
         // Loop through the orderCart array and print each item along with its quantity and price
         int totalAmount = 0;
