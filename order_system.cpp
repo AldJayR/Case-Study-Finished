@@ -5,40 +5,43 @@
 #include <sstream>
 #include "order_system.h"
 
-constexpr int g_MAX_ORDERS = 10;
-std::string orderCart[g_MAX_ORDERS];
+constexpr int g_MAX_ORDERS = 15;
+string orderCart[g_MAX_ORDERS];
 int g_orderIndex = 0;
 int price[g_MAX_ORDERS];
-const std::string itemNames[] = {"Fries", "Coke", "Chicken with Rice", "Ice Cream", "Menudo", "Burger", "Pizza", "Salad", "Spaghetti", "Sushi"};
-constexpr int itemPrices[] = {40, 25, 70, 25, 50, 60, 100, 45, 80, 120};
+const string itemNames[] = {"Fries", "Coke", "Chicken with Rice", "Ice Cream", "Menudo", "Burger",
+"Pizza", "Salad", "Spaghetti", "Sushi", "Adobo", "Sinigang", "Pancit", "Lumpia", "Halo-halo"};
+constexpr int itemPrices[] = {30, 25, 60, 25, 60, 50, 85, 40, 70, 100, 70, 50, 60, 40, 50};
 int quantityAmount[g_MAX_ORDERS] = {};
 bool isCheckout = false;
 
 using namespace std;
 
+// Print the hardcoded menu of available items
 void printOrderItems()
 {
-    cout << "+------------------------------------------------------------------------------------------+\n";
-    cout << "|                                                                                          |\n";
-    cout << "|                                   ARDEE'S CANTEEN                                        |\n";
-    cout << "|                                                                                          |\n";
-    cout << "+------------------------------------------------------------------------------------------+\n";
-    cout << "|                                                                                          |\n";
-    cout << "|                                   PICK YOUR ORDER                                        |\n";
-    cout << "|                                                                                          |\n";
-    cout << "|  1. Fries - P40                                  6. Burger - P60                         |\n";
-    cout << "|                                                                                          |\n";
-    cout << "|  2. Coke - P25                                   7. Pizza - P100                         |\n";
-    cout << "|                                                                                          |\n";
-    cout << "|  3. Chicken with Rice - P70                      8. Salad - P45                          |\n";
-    cout << "|                                                                                          |\n";
-    cout << "|  4. Ice Cream - P25                              9. Spaghetti - P80                      |\n";
-    cout << "|                                                                                          |\n";
-    cout << "|  5. Menudo - P50                                 10. Sushi - P120                        |\n";
-    cout << "|                                                                                          |\n";
-    cout << "+------------------------------------------------------------------------------------------+\n";
+    cout << "+------------------------------------------------------------------------------------------+" << '\n';
+    cout << "|                                                                                          |" << '\n';
+    cout << "|                                       ARDEE'S                                            |" << '\n';
+    cout << "|                                                                                          |" << '\n';
+    cout << "+------------------------------------------------------------------------------------------+" << '\n';
+    cout << "|                                                                                          |" << '\n';
+    cout << "|                                   PICK YOUR ORDER                                        |" << '\n';
+    cout << "|                                                                                          |" << '\n';
+    cout << "|  1. Fries - P30                   6. Burger - P50          11. Adobo - P70               |" << '\n';
+    cout << "|                                                                                          |" << '\n';
+    cout << "|  2. Coke - P25                    7. Pizza - P85           12. Sinigang - P50            |" << '\n';
+    cout << "|                                                                                          |" << '\n';
+    cout << "|  3. Chicken with Rice - P60       8. Salad - P40           13. Pancit - P60              |" << '\n';
+    cout << "|                                                                                          |" << '\n';
+    cout << "|  4. Ice Cream - P25               9. Spaghetti - P70       14. Lumpia - P40              |" << '\n';
+    cout << "|                                                                                          |" << '\n';
+    cout << "|  5. Menudo with Rice - P60        10. Sushi - P100         15. Halo-halo - P50           |" << '\n';
+    cout << "|                                                                                          |" << '\n';
+    cout << "+------------------------------------------------------------------------------------------+" << '\n';
 }
 
+// Handle the order system
 void orderSystem(string orderMessage, bool &dine, bool &newOrder)
 {
     char prompt;
@@ -48,31 +51,38 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
     while (toupper(prompt) != 'N')
     {
         char order;
+        // Check if it's a new order and if the order index is 0
         if (!newOrder && g_orderIndex == 0)
         {
             cout << "\nDine in or Take Out (D/T) ";
             cin >> order;
         }
 
+        // Check if the user selected dine-in option
         if (toupper(order) != 'T')
         {
             dine = true;
+            g_orderIndex == 0 ? cout << "DINE IN\n" : cout << "";
         }
 
-        cout << "\nWhat would you like to order? (1-10) ";
+        (!dine && g_orderIndex == 0) ? cout << "TAKE OUT" : cout << "";
+
+        cout << "\nWhat would you like to order? (1-15) ";
         int item;
         cin >> item;
-        int itemAmount;
+        int itemAmount = 0;
 
-        while (cin.fail() || item < 1 || item > 10)
+        // Validate the user input
+        while (cin.fail() || item < 1 || item > 15)
         {
-            cout << "Invalid input! Please enter a number between 1 and 10.\n";
+            cout << "Invalid input! Please enter a number between 1 and 15.\n";
             cin.clear();
             cin.ignore(100, '\n');
-            cout << "\n\nWhat would you like to order? (1-10) ";
+            cout << "\n\nWhat would you like to order? (1-15) ";
             cin >> item;
         }
 
+        // Calculate the total quantity of the selected item in the order
         int totalQuantity = 0;
         for (int i = 0; i < g_orderIndex; ++i)
         {
@@ -82,6 +92,7 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
             }
         }
 
+        // Check if the total quantity exceeds the limit
         if (totalQuantity >= 10)
         {
             cout << "You cannot order more than ten items of this type!" << '\n';
@@ -95,7 +106,8 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
             cout << "How much would you like? (cannot exceed more than 10 items) ";
             cin >> itemAmount;
 
-             if (cin.fail() || itemAmount <= 0 || itemAmount > 10)
+            // Validate the quantity input
+            if (cin.fail() || itemAmount <= 0 || itemAmount > 10)
             {
                 cout << "\nInvalid amount! Please enter a positive integer less than or equal to 10.\n";
                 cin.clear();
@@ -104,10 +116,27 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
         }
         while (cin.fail() || itemAmount <= 0 || itemAmount > 10);
 
+        // Check if the total quantity exceeds the limit after adding the new quantity
+        if (totalQuantity + itemAmount > 10)
+        {
+            cout << "You cannot order more than ten items of this type!\n";
+            do
+            {
+                cout << "How much would you like? (cannot exceed more than 10 items) ";
+                cin.clear();
+                cin.ignore(100, '\n');
+                cin >> itemAmount;
+            }
+            while (totalQuantity + itemAmount > 10);
+        }
+
+
         cout << "You have ordered " << itemAmount << " " << itemNames[item - 1] << "(s)." << '\n';
 
+        // Calculate the total price for the ordered item
         int totalPrice = itemPrices[item - 1] * itemAmount;
 
+        // Store the order details
         quantityAmount[g_orderIndex] = itemAmount;
         orderCart[g_orderIndex] = itemNames[item - 1];
         price[g_orderIndex] = totalPrice;
@@ -118,24 +147,28 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
     }
 }
 
+// Remove duplicate orders and update quantities and prices
 void checkDuplicate()
 {
     for (int i = 0; i < g_orderIndex; i++)
     {
         for (int j = i + 1; j < g_orderIndex; j++)
         {
+            // If duplicate order found
             if (orderCart[i] == orderCart[j])
             {
+                // Update the quantity and price of the first occurrence
                 quantityAmount[i] += quantityAmount[j];
                 price[i] += price[j];
 
+                // Shift the remaining orders to remove the duplicate
                 for (int k = j; k < g_orderIndex - 1; k++)
                 {
                     orderCart[k] = orderCart[k + 1];
                     quantityAmount[k] = quantityAmount[k + 1];
                     price[k] = price[k + 1];
                 }
-
+                // Decrement the order index since a duplicate was removed
                 g_orderIndex--;
                 j--;
             }
@@ -143,15 +176,18 @@ void checkDuplicate()
     }
 }
 
+// Display the current cart and calculate the total price
 void checkCart(int *priceSum)
 {
+    // Remove duplicate orders and update quantities and prices
     checkDuplicate();
+
     *priceSum = 0;
 
     cout << '\n';
-    cout << "+-------------------------------------------------------+\n";
-    cout << "|                        CART                           |\n";
-    cout << "+-------------------------------------------------------+\n";
+    cout << "+-------------------------------------------------------+" << '\n';
+    cout << "|                        CART                           |" << '\n';
+    cout << "+-------------------------------------------------------+" << '\n';
 
     bool cartEmpty = true;
 
@@ -170,11 +206,12 @@ void checkCart(int *priceSum)
         cout << "You do not have any items in your cart.\n";
     }
 
-    cout << "\n\n---------------------------------------------------------\n";
+    cout << "\n\n---------------------------------------------------------" << '\n';
     cout << "\nTotal Price is: P" << *priceSum << '\n';
-    cout << "\n---------------------------------------------------------\n";
+    cout << "\n---------------------------------------------------------" << '\n';
 }
 
+// Get the index of an item in the itemNames array
 int getItemPriceIndex(string itemName)
 {
     for (int i = 0; i < g_MAX_ORDERS; ++i)
@@ -185,12 +222,14 @@ int getItemPriceIndex(string itemName)
     return 1;
 }
 
+// Update the quantity of an existing order
 void updateItem()
 {
     cout << "Enter Item Number: ";
     int itemNumber;
     cin >> itemNumber;
 
+    // Validate the item number
     if (cin.fail() || itemNumber < 1 || itemNumber > g_orderIndex)
     {
         cout << "Invalid item number!\n";
@@ -212,6 +251,7 @@ void updateItem()
             int amountUpdate;
             cin >> amountUpdate;
 
+            // Calculate the total quantity of the selected item
             int totalQuantity = 0;
             for (int i = 0; i < g_orderIndex; ++i)
             {
@@ -221,15 +261,32 @@ void updateItem()
                 }
             }
 
+            // Check if the total quantity exceeds the limit
             if (totalQuantity >= 10)
             {
                 cout << "You cannot order more than ten items of this type!" << '\n';
                 return;
             }
 
+            if (totalQuantity + amountUpdate > 10)
+            {
+            cout << "You cannot order more than ten items of this type!\n";
+                do
+                {
+                    cout << "Enter amount you want to add: ";
+                    cin.clear();
+                    cin.ignore(100, '\n');
+                    cin >> amountUpdate;
+                }
+                while (totalQuantity + amountUpdate > 10);
+            }
+
+
+            // Update the price and quantity
             price[itemNumber - 1] += itemPrices[itemPriceIndex] * amountUpdate;
             quantityAmount[itemNumber - 1] += amountUpdate;
 
+            // Validate the quantity input
             if (cin.fail() || amountUpdate <= 0)
             {
                 cout << "Invalid input! Please enter a positive integer.\n";
@@ -246,6 +303,7 @@ void updateItem()
             int amountMinus;
             cin >> amountMinus;
 
+            // Validate the quantity input
            if (cin.fail() || amountMinus <= 0)
             {
                 cout << "Invalid input! Please enter a positive integer.\n";
@@ -254,9 +312,11 @@ void updateItem()
                 return;
             }
 
+            // Update the price and quantity
             price[itemNumber - 1] -= itemPrices[itemPriceIndex] * amountMinus;
             quantityAmount[itemNumber - 1] -= amountMinus;
 
+            // If the quantity becomes zero, remove the order
             if (quantityAmount[itemNumber - 1] == 0)
             {
                 for (int i = itemNumber - 1; i < g_orderIndex - 1; ++i)
@@ -278,12 +338,14 @@ void updateItem()
     }
 }
 
+// Delete an existing order
 void deleteItem()
 {
     cout << "Enter Item Number: ";
     int itemNumber;
     cin >> itemNumber;
 
+    // Validate the item number
     if (cin.fail() || itemNumber < 1 || itemNumber > g_orderIndex)
     {
         cout << "Invalid item number!" << '\n';
@@ -295,6 +357,7 @@ void deleteItem()
     char deleteCart;
     cin >> deleteCart;
 
+    // Delete the order if the user confirms
     if (toupper(deleteCart) != 'N')
     {
         for (int i = itemNumber - 1; i < g_orderIndex - 1; ++i)
@@ -316,6 +379,7 @@ void deleteItem()
     }
 }
 
+// Ask the user if they want to check out
 bool askCheckout()
 {
     cout << "\nWould you like to check out? ";
@@ -325,6 +389,7 @@ bool askCheckout()
     return (toupper(decision) != 'N');
 }
 
+// Drop all orders and reset the order system
 int dropOrders()
 {
     cout << "\nOrders dropped!" << '\n';
@@ -343,22 +408,25 @@ int dropOrders()
     return 1;
 }
 
+// Handle the checkout process
 void checkout(int *money, int *priceSum)
 {
     if (*priceSum != 0)
     {
-        cout << "\nPayment: ";
+        cout << "\nPayment (Cash): ";
         cin >> *money;
 
+        // Validate the payment input
         while (cin.fail() || *money < 0)
         {
             cout << "Invalid input! Please enter a positive number.\n";
             cin.clear();
             cin.ignore(100, '\n');
-            cout << "\nPayment: ";
+            cout << "\nPayment (Cash): ";
             cin >> *money;
         }
 
+        // Check if the payment is sufficient
         if (*money < *priceSum)
         {
             cout << "You do not have enough cash!"
@@ -385,6 +453,7 @@ void checkout(int *money, int *priceSum)
     }
 }
 
+// Get the current date and time
 string getCurrentDateTime()
 {
     time_t currentTime = time(nullptr);
@@ -394,6 +463,7 @@ string getCurrentDateTime()
     return oss.str();
 }
 
+// Print the receipt
 void printReceipt(int *money, bool &dine)
 {
     string orderTime = getCurrentDateTime();
@@ -402,17 +472,17 @@ void printReceipt(int *money, bool &dine)
     {
         system("CLS");
         cout << '\n';
-        cout << "+------------------------------------------------------------+\n";
-        cout << "|                    ARDEE'S CANTEEN                         |\n";
-        cout << "|               " << orderTime << "                  |\n";
-        cout << "|                San Antonio, Nueva Ecija                    |\n";
-        cout << "|                    +63902020202                            |\n";
-        cout << "+------------------------------------------------------------+\n";
-        cout << "| QTY    | ITEM                      | PRICE   |    TOTAL    |\n";
-        cout << "+------------------------------------------------------------+\n";
-        cout << "|                                                            |\n";
-        cout << "|-----------------------" << (dine ? "DINE IN-" : "TAKE OUT") << "-----------------------------|\n";
-        cout << "|                                                            |\n";
+        cout << "+------------------------------------------------------------+" << '\n';
+        cout << "|                       ARDEE'S                               " << '\n';
+        cout << "|               " << orderTime << "                  |" << '\n';
+        cout << "|                San Antonio, Nueva Ecija                    |" << '\n';
+        cout << "|                    +63902020202                            |" << '\n';
+        cout << "+------------------------------------------------------------+" << '\n';
+        cout << "| QTY    | ITEM                      | PRICE   |    TOTAL    |" << '\n';
+        cout << "+------------------------------------------------------------+" << '\n';
+        cout << "|                                                            |" << '\n';
+        cout << "|-----------------------" << (dine ? "DINE IN-" : "TAKE OUT") << "-----------------------------|" << '\n';
+        cout << "|                                                            |" << '\n';
 
         int totalAmount = 0;
 
@@ -420,7 +490,7 @@ void printReceipt(int *money, bool &dine)
         {
             cout << "| " << setw(5) << left << quantityAmount[i] << "  | " << setw(25) << left << orderCart[i] << " | P" <<
                 setw(6) << left << fixed << setprecision(2) << static_cast<double>(price[i] / quantityAmount[i]) <<
-                    " | P" << setw(8) << left << fixed << setprecision(2) <<  static_cast<double>(price[i]) << "   |\n";
+                    " | P" << setw(8) << left << fixed << setprecision(2) <<  static_cast<double>(price[i]) << "   |" << '\n';
             totalAmount += price[i];
         }
 
@@ -428,14 +498,14 @@ void printReceipt(int *money, bool &dine)
         double vatSales = totalAmount / vat;
         double VAT_tax = totalAmount - vatSales;
 
-        cout << "+------------------------------------------------------------+\n";
+        cout << "+------------------------------------------------------------+" << '\n';
         cout << "|                            TOTAL: (" << g_orderIndex << ")                      |" << '\n';
         cout << "|                            Vatable Sales: P" << fixed << setprecision(2) << setw(8) << right << vatSales << "        |" << '\n';
         cout << "|                            VAT (12%):     P" << setw(8) << right << VAT_tax << "        |" << '\n';
         cout << "|                            TOTAL:         P" << setw(8) << right << fixed << setprecision(2) << static_cast<double>(totalAmount) << "        |" << '\n';
         cout << "|                            CASH:          P" << setw(8) << right << fixed << setprecision(2) << static_cast<double>(*money) << "        |" << '\n';
         cout << "|                            CHANGE:        P" << setw(8) << right << fixed << setprecision(2) << static_cast<double>(*money - totalAmount) << "        |" << '\n';
-        cout << "+------------------------------------------------------------+\n";
+        cout << "+------------------------------------------------------------+" << '\n';
 
         cout << "|                                                            |" << '\n';
         cout << "|                                                            |" << '\n';
@@ -454,5 +524,6 @@ void printReceipt(int *money, bool &dine)
             cout << "|                                                            |" << '\n';
         }
         cout << "+------------------------------------------------------------+" << '\n';
+
     }
 }

@@ -31,6 +31,12 @@ int main()
     {
         checkout(&money, &priceSum);
         printReceipt(&money, isDine);
+        cout << "Thank you for coming to Ardee's Canteen. Please come again" << '\n';
+
+
+        cout << "\nPress Enter to exit...";
+        cin.ignore();
+        cin.get();
         return 0;
     }
 
@@ -83,7 +89,14 @@ int main()
     {
         checkout(&money, &priceSum);
         printReceipt(&money, isDine);
+        cout << "Thank you for coming to Ardee's Canteen. Please come again" << '\n';
+
+
+        cout << "\nPress Enter to exit...";
+        cin.ignore();
+        cin.get();
     }
+
 
     return 0;
 }
