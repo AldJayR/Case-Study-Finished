@@ -19,10 +19,10 @@ int main()
     printOrderItems();
 
     // Welcome message
-    string welcomeMeeting = "\\nWelcome to Ardee's Canteen. Press 'Y' to get started. ";
+    string welcomeMeeting = "\nWelcome to Ardee's Canteen. Press 'Y' to get started. ";
 
     // Message for ordering again
-    string orderingAgain = "\\nPress 'Y' to continue: ";
+    string orderingAgain = "\nPress 'Y' to continue: ";
 
     // Start the order system with the welcome message
     orderSystem(welcomeMeeting, isDine, newOrder);
@@ -31,7 +31,7 @@ int main()
     checkCart(&priceSum);
 
     char decision;
-    cout << "\\nWould you like to checkout? (Y/N) ";
+    cout << "\nWould you like to checkout? (Y/N) ";
     cin >> decision;
 
     // If the user wants to checkout
@@ -40,7 +40,7 @@ int main()
         // Handle checkout process
         checkout(&money, &priceSum);
         printReceipt(&money, isDine);
-        cout << "Thank you for coming to Ardee's Canteen. Please come again" << '\\n';
+        cout << "Thank you for coming to Ardee's Canteen. Please come again" << '\n';
         cout << "\\nPress Enter to exit...";
         cin.ignore();
         cin.get();
@@ -70,9 +70,9 @@ int main()
         if (modify)
         {
             // Print options for modification
-            cout << "\\n(1) Delete Item"
-                 << "\\n(2) Update Item"
-                 << "\\n(3) Order Again" << '\\n';
+            cout << "\n(1) Delete Item"
+                 << "\n(2) Update Item"
+                 << "\n(3) Order Again" << '\n';
 
             int option;
             cin >> option;
@@ -107,8 +107,8 @@ int main()
     {
         checkout(&money, &priceSum);
         printReceipt(&money, isDine);
-        cout << "Thank you for coming to Ardee's Canteen. Please come again" << '\\n';
-        cout << "\\nPress Enter to exit...";
+        cout << "Thank you for coming to Ardee's Canteen. Please come again" << '\n';
+        cout << "\nPress Enter to exit...";
         cin.ignore();
         cin.get();
     }
