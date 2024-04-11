@@ -473,7 +473,7 @@ void printReceipt(int *money, bool &dine)
         system("CLS");
         cout << '\n';
         cout << "+------------------------------------------------------------+" << '\n';
-        cout << "|                       ARDEE'S                               " << '\n';
+        cout << "|                       ARDEE'S                              |" << '\n';
         cout << "|               " << orderTime << "                  |" << '\n';
         cout << "|                San Antonio, Nueva Ecija                    |" << '\n';
         cout << "|                    +63902020202                            |" << '\n';
