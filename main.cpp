@@ -19,7 +19,7 @@ int main()
     printOrderItems();
 
     // Welcome message
-    string welcomeMeeting = "\nWelcome to Ardee's Canteen. Press 'Y' to get started. ";
+    string welcomeMeeting = "\nWelcome to Ardee's. Press 'Y' to get started. ";
 
     // Message for ordering again
     string orderingAgain = "\nPress 'Y' to continue: ";
@@ -40,8 +40,8 @@ int main()
         // Handle checkout process
         checkout(&money, &priceSum);
         printReceipt(&money, isDine);
-        cout << "Thank you for coming to Ardee's Canteen. Please come again" << '\n';
-        cout << "\\nPress Enter to exit...";
+        cout << "Thank you for coming to Ardee's. Please come again" << '\n';
+        cout << "\nPress Enter to exit...";
         cin.ignore();
         cin.get();
         return 0; // Exit the program
@@ -107,7 +107,7 @@ int main()
     {
         checkout(&money, &priceSum);
         printReceipt(&money, isDine);
-        cout << "Thank you for coming to Ardee's Canteen. Please come again" << '\n';
+        cout << "Thank you for coming to Ardee's. Please come again" << '\n';
         cout << "\nPress Enter to exit...";
         cin.ignore();
         cin.get();
