@@ -19,7 +19,7 @@ int main()
     printOrderItems();
 
     // Welcome message
-    string welcomeMeeting = "\nWelcome to Ardee's. Press 'Y' to get started. ";
+    string welcomeMeeting = "\nWelcome to Ardee's Canteen. Press 'Y' to get started. ";
 
     // Message for ordering again
     string orderingAgain = "\nPress 'Y' to continue: ";
@@ -72,7 +72,8 @@ int main()
             // Print options for modification
             cout << "\n(1) Delete Item"
                  << "\n(2) Update Item"
-                 << "\n(3) Order Again" << '\n';
+                 << "\n(3) Order Again"
+                 << "\n(4) Go Back" << '\n';
 
             int option;
             cin >> option;
@@ -91,14 +92,22 @@ int main()
                 printOrderItems();   // Print the menu of available items
                 orderSystem(orderingAgain, isDine, newOrder); // Start the order system with the "ordering again" message
                 break;
+            case 4:
+                checkCart(&priceSum);
+                orderPrompt = 'N';
+                break;
             default:
                 cout << "Invalid option! Select again"; // Print an error message for invalid input
                 continue;                               // Continue the loop to allow the user to select again
             }
 
             // Display the updated cart and total price
-            checkCart(&priceSum);
-            continue; // Continue the loop to allow further modifications
+            if (option != 4)
+            {
+                checkCart(&priceSum);
+                continue; // Continue the loop to allow further modifications
+            }
+
         }
     }
 
