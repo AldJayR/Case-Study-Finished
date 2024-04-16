@@ -527,3 +527,13 @@ void printReceipt(int *money, bool &dine)
 
     }
 }
+
+void directCheckout(int *money, int *priceSum, bool &dine)
+{
+    checkout(money, priceSum);
+    printReceipt(money, dine);
+    cout << "Thank you for coming to Ardee's. Please come again" << '\n';
+    cout << "\nPress Enter to exit...";
+    cin.ignore();
+    cin.get();
+}

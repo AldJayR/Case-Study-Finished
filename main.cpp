@@ -38,12 +38,7 @@ int main()
     if (toupper(decision) != 'N')
     {
         // Handle checkout process
-        checkout(&money, &priceSum);
-        printReceipt(&money, isDine);
-        cout << "Thank you for coming to Ardee's. Please come again" << '\n';
-        cout << "\nPress Enter to exit...";
-        cin.ignore();
-        cin.get();
+        directCheckout(&money, &priceSum, isDine);
         return 0; // Exit the program
     }
 
@@ -114,13 +109,8 @@ int main()
     // If the user wants to checkout after modifying the order
     if (askCheckout())
     {
-        checkout(&money, &priceSum);
-        printReceipt(&money, isDine);
-        cout << "Thank you for coming to Ardee's. Please come again" << '\n';
-        cout << "\nPress Enter to exit...";
-        cin.ignore();
-        cin.get();
+       directCheckout(&money, &priceSum, isDine);
     }
 
-    return 0; // Exit the program
+    return 0;
 }
