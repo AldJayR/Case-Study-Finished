@@ -21,9 +21,6 @@ int main()
     // Welcome message
     string welcomeMeeting = "\nWelcome to Ardee's. Press anything to get started. ";
 
-    // Message for ordering again
-    string orderingAgain = "";
-
     // Start the order system with the welcome message
     orderSystem(welcomeMeeting, isDine, newOrder);
 
@@ -64,7 +61,7 @@ int main()
         }
 
         // If modification is requested
-        if (modify)
+        while (modify)
         {
             // Print options for modification
             cout << "\n(1) Delete Item"
@@ -75,26 +72,38 @@ int main()
             int option;
             cin >> option;
 
+            while (cin.fail())
+            {
+                cin.clear();
+                cin.ignore(100, '\n');
+                option = 5;
+            }
+
+
             // Handle the selected option
             switch (option)
             {
             case 1:
                 deleteItem(); // Delete an existing order
+                modify = false;
                 break;
             case 2:
                 updateItem(); // Update the quantity of an existing order
+                modify = false;
                 break;
             case 3:
                 newOrder = true;     // Set the flag to indicate it's a new order
                 printOrderItems();   // Print the menu of available items
-                orderSystem(orderingAgain, isDine, newOrder); // Start the order system with the "ordering again" message
+                orderSystem("", isDine, newOrder); // Start the order system with the "ordering again" message
+                modify = false;
                 break;
             case 4:
                 checkCart(&priceSum);
                 orderPrompt = 'N';
+                modify = false;
                 break;
             default:
-                cout << "Invalid option! Select again"; // Print an error message for invalid input
+                cout << "Invalid option! Select again\n"; // Print an error message for invalid input
                 continue;                               // Continue the loop to allow the user to select again
             }
 
