@@ -50,8 +50,9 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
     char prompt = 'Y';
     cout << orderMessage;
     cin.get();
+    cin.ignore(100, '\n');
 
-    while (toupper(prompt) != 'N')
+    while (toupper(prompt) == 'Y')
     {
         char order;
         // Check if it's a new order and if the order index is 0
@@ -152,9 +153,26 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
         price[g_orderIndex] = totalPrice;
         g_orderIndex++;
 
-        cout << "Would you like to order more? (Y/N) ";
-        cin >> prompt;
-        cin.ignore(100, '\n');
+        int errorFails = 0;
+
+        do
+        {
+            if (errorFails == 0)
+            {
+                cout << "Would you like to order more? (Y/N) ";
+                cin >> prompt;
+                cin.ignore(100, '\n');
+            }
+            else
+            {
+                cout << "Invalid input. Please try again." << '\n';
+                cout << "Would you like to order more? (Y/N) ";
+                cin >> prompt;
+                cin.ignore(100, '\n');
+            }
+            errorFails++;
+        }
+        while (toupper(prompt) != 'Y' && toupper(prompt) != 'N' );
     }
 }
 
