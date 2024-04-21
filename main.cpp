@@ -19,10 +19,10 @@ int main()
     printOrderItems();
 
     // Welcome message
-    string welcomeMeeting = "\nWelcome to Ardee's Canteen. Press 'Y' to get started. ";
+    string welcomeMeeting = "\nWelcome to Ardee's. Press anything to get started. ";
 
     // Message for ordering again
-    string orderingAgain = "\nPress 'Y' to continue: ";
+    string orderingAgain = "";
 
     // Start the order system with the welcome message
     orderSystem(welcomeMeeting, isDine, newOrder);
@@ -33,6 +33,7 @@ int main()
     char decision;
     cout << "\nWould you like to checkout? (Y/N) ";
     cin >> decision;
+    cin.ignore(100, '\n');
 
     // If the user wants to checkout
     if (toupper(decision) != 'N')
@@ -50,6 +51,7 @@ int main()
     {
         cout << "Do you want to modify your existing orders? (Y/N) ";
         cin >> orderPrompt;
+        cin.ignore(100, '\n');
 
         // If the user wants to modify the order
         if (toupper(orderPrompt) != 'N')
@@ -68,7 +70,7 @@ int main()
             cout << "\n(1) Delete Item"
                  << "\n(2) Update Item"
                  << "\n(3) Order Again"
-                 << "\n(4) Go Back" << '\n';
+                 << "\n(4) Go Back \n>> ";
 
             int option;
             cin >> option;

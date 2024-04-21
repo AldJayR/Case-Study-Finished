@@ -3,6 +3,8 @@
 #include <ctime>
 #include <iomanip>
 #include <sstream>
+#include <chrono>
+#include <thread>
 #include "order_system.h"
 
 constexpr int g_MAX_ORDERS = 15;
@@ -44,9 +46,9 @@ void printOrderItems()
 // Handle the order system
 void orderSystem(string orderMessage, bool &dine, bool &newOrder)
 {
-    char prompt;
+    char prompt = 'Y';
     cout << orderMessage;
-    cin >> prompt;
+    cin.get();
 
     while (toupper(prompt) != 'N')
     {
@@ -56,10 +58,17 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
         {
             cout << "\nDine in or Take Out (D/T) ";
             cin >> order;
+            cin.ignore(100, '\n');
         }
 
         // Check if the user selected dine-in option
-        if (toupper(order) != 'T')
+
+        if (toupper(order) != 'T' && toupper(order) != 'D' && !newOrder)
+        {
+            cout << "Invalid input! Please enter again";
+            continue;
+        }
+        else if (toupper(order) != 'T')
         {
             dine = true;
             g_orderIndex == 0 ? cout << "DINE IN\n" : cout << "";
@@ -144,6 +153,7 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
 
         cout << "Would you like to order more? (Y/N) ";
         cin >> prompt;
+        cin.ignore(100, '\n');
     }
 }
 
@@ -398,6 +408,7 @@ bool askCheckout()
 // Drop all orders and reset the order system
 int dropOrders()
 {
+    exitSystem();
     cout << "\nOrders dropped!" << '\n';
 
     g_orderIndex = 0;
@@ -408,8 +419,6 @@ int dropOrders()
         orderCart[i] = "";
         quantityAmount[i] = 0;
     }
-
-    cout << "Thank you for coming to Ardee's Canteen!" << '\n';
 
     return 1;
 }
@@ -481,7 +490,7 @@ void printReceipt(int *money, bool &dine)
         cout << '\n';
         cout << "+------------------------------------------------------------+" << '\n';
         cout << "|                       ARDEE'S                              |" << '\n';
-        cout << "|               " << orderTime << "                    |" << '\n';
+        cout << "|               " << orderTime << "                  |" << '\n';
         cout << "|                San Antonio, Nueva Ecija                    |" << '\n';
         cout << "|                    +63902020202                            |" << '\n';
         cout << "+------------------------------------------------------------+" << '\n';
@@ -543,4 +552,15 @@ void directCheckout(int *money, int *priceSum, bool &dine)
     cout << "\nPress Enter to exit...";
     cin.ignore();
     cin.get();
+}
+
+void exitSystem()
+{
+    cout << "Canceling order";
+    for (int i = 0; i < 3; ++i)
+    {
+        cout << '.';
+        this_thread::sleep_for(chrono::milliseconds(300));
+    }
+    cout << '\n';
 }

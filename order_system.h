@@ -22,5 +22,6 @@ void checkout(int *money, int *priceSum);
 string getCurrentDateTime();
 void printReceipt(int *money, bool &dine);
 void directCheckout(int *money, int *priceSum, bool &dine);
+void exitSystem();
 
 #endif // ORDER_SYSTEM_H_INCLUDED
