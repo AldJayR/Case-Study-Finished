@@ -5,6 +5,7 @@
 #include <sstream>
 #include <chrono>
 #include <thread>
+#include <cstdlib>
 #include "order_system.h"
 
 constexpr int g_MAX_ORDERS = 15;
@@ -481,16 +482,23 @@ string getCurrentDateTime()
 // Print the receipt
 void printReceipt(int *money, bool &dine)
 {
-    string orderTime = getCurrentDateTime();
+    // Array of cashier names
+    const string cashierNames[] = {"Jannel Idago", "Amiel Ardee Aclan", "Justine Quilantang", "Jairo Jones", "Aldwin Sarte", "Hans Flores", "Russel Simbre", "Melgine Bauat", "King Idago", "Sherilyn Moran", };
 
+    string orderTime = getCurrentDateTime();
 
     if (isCheckout)
     {
+        // Randomly select a cashier name
+        srand(time(nullptr));
+        int index = rand() % 5; // 5 is the number of names in the array
+        string cashierName = cashierNames[index];
+
         system("CLS");
         cout << '\n';
         cout << "+------------------------------------------------------------+" << '\n';
         cout << "|                       ARDEE'S                              |" << '\n';
-        cout << "|               " << orderTime << "                  |" << '\n';
+        cout << "|               " << orderTime << "                     |" << '\n';
         cout << "|                San Antonio, Nueva Ecija                    |" << '\n';
         cout << "|                    +63902020202                            |" << '\n';
         cout << "+------------------------------------------------------------+" << '\n';
@@ -531,6 +539,8 @@ void printReceipt(int *money, bool &dine)
         {
             cout << "|                                                            |" << '\n';
         }
+        // Include cashier name in the receipt
+        cout << "|  Sold by: " << cashierName << "                                  |" << '\n';
         cout << "|  Sold to: _________________________                        |" << '\n';
         cout << "|  Name: ____________________________                        |" << '\n';
         cout << "|  Address: _________________________                        |" << '\n';
@@ -543,6 +553,7 @@ void printReceipt(int *money, bool &dine)
 
     }
 }
+
 
 void directCheckout(int *money, int *priceSum, bool &dine)
 {
