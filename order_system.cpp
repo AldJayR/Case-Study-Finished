@@ -50,8 +50,9 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
     char prompt = 'Y';
     cout << orderMessage;
     cin.get();
+    cin.ignore(100, '\n');
 
-    while (toupper(prompt) != 'N')
+    while (toupper(prompt) == 'Y')
     {
         char order;
         // Check if it's a new order and if the order index is 0
@@ -80,6 +81,7 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
         cout << "\nWhat would you like to order? (1-15) ";
         int item;
         cin >> item;
+        cin.ignore(100, '\n');
         int itemAmount = 0;
 
         // Validate the user input
@@ -90,6 +92,7 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
             cin.ignore(100, '\n');
             cout << "\n\nWhat would you like to order? (1-15) ";
             cin >> item;
+            cin.ignore(100, '\n');
         }
 
         // Calculate the total quantity of the selected item in the order
@@ -113,8 +116,9 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
 
         do
         {
-            cout << "How much would you like? (cannot exceed more than 10 items) ";
+            cout << "How many would you like? (cannot exceed more than 10 items) ";
             cin >> itemAmount;
+            cin.ignore(100, '\n');
 
             // Validate the quantity input
             if (cin.fail() || itemAmount <= 0 || itemAmount > 10)
@@ -132,7 +136,7 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
             cout << "You cannot order more than ten items of this type!\n";
             do
             {
-                cout << "How much would you like? (cannot exceed more than 10 items) ";
+                cout << "How many would you like? (cannot exceed more than 10 items) ";
                 cin.clear();
                 cin.ignore(100, '\n');
                 cin >> itemAmount;
@@ -152,9 +156,26 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
         price[g_orderIndex] = totalPrice;
         g_orderIndex++;
 
-        cout << "Would you like to order more? (Y/N) ";
-        cin >> prompt;
-        cin.ignore(100, '\n');
+        int errorFails = 0;
+
+        do
+        {
+            if (errorFails == 0)
+            {
+                cout << "Would you like to order more? (Y/N) ";
+                cin >> prompt;
+                cin.ignore(100, '\n');
+            }
+            else
+            {
+                cout << "Invalid input. Please try again." << '\n';
+                cout << "Would you like to order more? (Y/N) ";
+                cin >> prompt;
+                cin.ignore(100, '\n');
+            }
+            errorFails++;
+        }
+        while (toupper(prompt) != 'Y' && toupper(prompt) != 'N' );
     }
 }
 
@@ -197,39 +218,40 @@ void checkCart(int *priceSum)
 
     cout << '\n';
     cout << "+----------------------------------------------------------------+" << '\n';
-    cout << "|                                 CART                           |" << '\n';
+    cout << "|                             CART                               |" << '\n';
     cout << "+----------------------------------------------------------------+" << '\n';
 
     bool cartEmpty = true;
 
-    cout << "| No. | Qty | Item                      | Price |  Total               |" << '\n';
-    cout << "+-----+-----+---------------------------+-------+----------------------+" << '\n';
+    cout << "|No. | Qty | Item                           | Price   | Total    |" << '\n';
+    cout << "+----+--------------------------------------+---------+----------+" << '\n';
 
-    int itemCounter = 1; // Counter for item numbers
+    int itemNumber = 1;
 
     for (int i = 0; i < g_orderIndex; i++)
     {
         if (quantityAmount[i] > 0)
         {
             int itemPriceIndex = getItemPriceIndex(orderCart[i]);
-            int totalItemPrice = quantityAmount[i] * itemPrices[itemPriceIndex]; // Calculate total price per item
-            cout << "| " << setw(3) << left << itemCounter << " | " << setw(3) << left << quantityAmount[i] << " | " << setw(25) << orderCart[i] << " | P " <<  itemPrices[itemPriceIndex] << "  | P " << totalItemPrice << setw(17) << right << "|" << '\n';
-            *priceSum += totalItemPrice; // Add total item price to priceSum
+            cout << "| " << setw(3) << left << itemNumber++ << "| " << setw(3) << left << quantityAmount[i]
+                 << " | " << setw(30) << left << orderCart[i] << " | P" << setw(7)
+                 << left << itemPrices[itemPriceIndex] << "| P" << setw(8) << left << price[i]  << "|" << '\n';
+
+            *priceSum += price[i];
             cartEmpty = false;
-            itemCounter++; // Increment item counter
         }
     }
 
     if (cartEmpty)
     {
-        cout << "|                No items in cart                     |" << '\n';
+        cout << "|                     No items in cart                           |" << '\n';
     }
 
     cout << "+----------------------------------------------------------------+" << '\n';
-    cout << "| Total Price: P" << *priceSum << setw(48) << right << "|"  << '\n';
+    cout << "| Total Price: P" << *priceSum << setw(50 - to_string(*priceSum).length()) << right << "|" << '\n';
     cout << "+----------------------------------------------------------------+" << '\n';
-}
 
+}
 
 // Get the index of an item in the itemNames array
 int getItemPriceIndex(string itemName)
@@ -248,6 +270,7 @@ void updateItem()
     cout << "Enter Item Number: ";
     int itemNumber;
     cin >> itemNumber;
+    cin.ignore(100, '\n');
 
     // Validate the item number
     if (cin.fail() || itemNumber < 1 || itemNumber > g_orderIndex)
@@ -267,7 +290,7 @@ void updateItem()
     {
     case '+':
         {
-            cout << "Enter amount you want to add: ";
+            cout << "Enter quantity you want to add: ";
             int amountUpdate;
             cin >> amountUpdate;
 
@@ -293,7 +316,7 @@ void updateItem()
             cout << "You cannot order more than ten items of this type!\n";
                 do
                 {
-                    cout << "Enter amount you want to add: ";
+                    cout << "Enter quantity you want to add: ";
                     cin.clear();
                     cin.ignore(100, '\n');
                     cin >> amountUpdate;
@@ -319,8 +342,9 @@ void updateItem()
         }
     case '-':
         {
-            cout << "Enter amount you want to remove: ";
+            cout << "Enter quantity you want to remove: ";
             int amountMinus;
+            cin.ignore(100, '\n');
             cin >> amountMinus;
 
             // Validate the quantity input
@@ -364,6 +388,7 @@ void deleteItem()
     cout << "Enter Item Number: ";
     int itemNumber;
     cin >> itemNumber;
+    cin.ignore(100, '\n');
 
     // Validate the item number
     if (cin.fail() || itemNumber < 1 || itemNumber > g_orderIndex)
@@ -402,7 +427,7 @@ void deleteItem()
 // Ask the user if they want to check out
 bool askCheckout()
 {
-    cout << "\nWould you like to check out? ";
+    cout << "\nWould you like to check out? ((Y/N) ";
     char decision;
     cin >> decision;
 
@@ -434,6 +459,7 @@ void checkout(int *money, int *priceSum)
     {
         cout << "\nPayment (Cash): ";
         cin >> *money;
+        cin.ignore(100, '\n');
 
         // Validate the payment input
         while (cin.fail() || *money < 0)
@@ -443,6 +469,7 @@ void checkout(int *money, int *priceSum)
             cin.ignore(100, '\n');
             cout << "\nPayment (Cash): ";
             cin >> *money;
+            cin.ignore(100, '\n');
         }
 
         // Check if the payment is sufficient
@@ -486,7 +513,8 @@ string getCurrentDateTime()
 void printReceipt(int *money, bool &dine)
 {
     // Array of cashier names
-    const string cashierNames[] = {"Jannel Idago", "Amiel Ardee Aclan", "Justine Quilantang", "Jairo Jones", "Aldwin Sarte", "Hans Flores", "Russel Simbre", "Melgine Bauat", "King Idago", "Sherilyn Moran", };
+    const string cashierNames[] = {"Jannel", "Amiel", "Justine", "Jairo",
+    "Aldwin", "Hans", "Russel", "Melgine", "King", "Sherilyn" };
 
     string orderTime = getCurrentDateTime();
 
@@ -501,7 +529,7 @@ void printReceipt(int *money, bool &dine)
         cout << '\n';
         cout << "+------------------------------------------------------------+" << '\n';
         cout << "|                       ARDEE'S                              |" << '\n';
-        cout << "|               " << orderTime << "                     |" << '\n';
+        cout << "|               " << orderTime << "                    |" << '\n';
         cout << "|                San Antonio, Nueva Ecija                    |" << '\n';
         cout << "|                    +63902020202                            |" << '\n';
         cout << "+------------------------------------------------------------+" << '\n';
@@ -543,7 +571,7 @@ void printReceipt(int *money, bool &dine)
             cout << "|                                                            |" << '\n';
         }
         // Include cashier name in the receipt
-        cout << "|  Sold by: " << cashierName << "                                  |" << '\n';
+        cout << "|  Sold by: " << setw(49) << left << cashierName << "|" << '\n';
         cout << "|  Sold to: _________________________                        |" << '\n';
         cout << "|  Name: ____________________________                        |" << '\n';
         cout << "|  Address: _________________________                        |" << '\n';
