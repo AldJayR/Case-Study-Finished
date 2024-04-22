@@ -50,9 +50,8 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
     char prompt = 'Y';
     cout << orderMessage;
     cin.get();
-    cin.ignore(100, '\n');
 
-    while (toupper(prompt) == 'Y')
+    while (toupper(prompt) != 'N')
     {
         char order;
         // Check if it's a new order and if the order index is 0
@@ -153,26 +152,9 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
         price[g_orderIndex] = totalPrice;
         g_orderIndex++;
 
-        int errorFails = 0;
-
-        do
-        {
-            if (errorFails == 0)
-            {
-                cout << "Would you like to order more? (Y/N) ";
-                cin >> prompt;
-                cin.ignore(100, '\n');
-            }
-            else
-            {
-                cout << "Invalid input. Please try again." << '\n';
-                cout << "Would you like to order more? (Y/N) ";
-                cin >> prompt;
-                cin.ignore(100, '\n');
-            }
-            errorFails++;
-        }
-        while (toupper(prompt) != 'Y' && toupper(prompt) != 'N' );
+        cout << "Would you like to order more? (Y/N) ";
+        cin >> prompt;
+        cin.ignore(100, '\n');
     }
 }
 
@@ -215,38 +197,39 @@ void checkCart(int *priceSum)
 
     cout << '\n';
     cout << "+----------------------------------------------------------------+" << '\n';
-    cout << "|                             CART                               |" << '\n';
+    cout << "|                                 CART                           |" << '\n';
     cout << "+----------------------------------------------------------------+" << '\n';
 
     bool cartEmpty = true;
 
-    cout << "|No. | Qty | Item                           | Price   | Total    |" << '\n';
-    cout << "+----+--------------------------------------+---------+----------+" << '\n';
+    cout << "| No. | Qty | Item                      | Price |  Total               |" << '\n';
+    cout << "+-----+-----+---------------------------+-------+----------------------+" << '\n';
+
+    int itemCounter = 1; // Counter for item numbers
 
     for (int i = 0; i < g_orderIndex; i++)
     {
         if (quantityAmount[i] > 0)
         {
             int itemPriceIndex = getItemPriceIndex(orderCart[i]);
-            cout << "| " << setw(3) << left << i + 1 << "| " << setw(3) << left << quantityAmount[i]
-                 << " | " << setw(30) << left << orderCart[i] << " | P" << setw(7)
-                 << left << itemPrices[itemPriceIndex] << "| P" << setw(8) << left << price[i]  << "|" << '\n';
-
-            *priceSum += price[i];
+            int totalItemPrice = quantityAmount[i] * itemPrices[itemPriceIndex]; // Calculate total price per item
+            cout << "| " << setw(3) << left << itemCounter << " | " << setw(3) << left << quantityAmount[i] << " | " << setw(25) << orderCart[i] << " | P " <<  itemPrices[itemPriceIndex] << "  | P " << totalItemPrice << setw(17) << right << "|" << '\n';
+            *priceSum += totalItemPrice; // Add total item price to priceSum
             cartEmpty = false;
+            itemCounter++; // Increment item counter
         }
     }
 
     if (cartEmpty)
     {
-        cout << "|                     No items in cart                           |" << '\n';
+        cout << "|                No items in cart                     |" << '\n';
     }
 
     cout << "+----------------------------------------------------------------+" << '\n';
-    cout << "| Total Price: P" << *priceSum << setw(50 - to_string(*priceSum).length()) << right << "|" << '\n';
+    cout << "| Total Price: P" << *priceSum << setw(48) << right << "|"  << '\n';
     cout << "+----------------------------------------------------------------+" << '\n';
-
 }
+
 
 // Get the index of an item in the itemNames array
 int getItemPriceIndex(string itemName)
@@ -503,8 +486,7 @@ string getCurrentDateTime()
 void printReceipt(int *money, bool &dine)
 {
     // Array of cashier names
-    const string cashierNames[] = {"Jannel", "Amiel", "Justine", "Jairo",
-    "Aldwin", "Hans", "Russel", "Melgine", "King", "Sherilyn", };
+    const string cashierNames[] = {"Jannel Idago", "Amiel Ardee Aclan", "Justine Quilantang", "Jairo Jones", "Aldwin Sarte", "Hans Flores", "Russel Simbre", "Melgine Bauat", "King Idago", "Sherilyn Moran", };
 
     string orderTime = getCurrentDateTime();
 
@@ -519,7 +501,7 @@ void printReceipt(int *money, bool &dine)
         cout << '\n';
         cout << "+------------------------------------------------------------+" << '\n';
         cout << "|                       ARDEE'S                              |" << '\n';
-        cout << "|               " << orderTime << "                  |" << '\n';
+        cout << "|               " << orderTime << "                     |" << '\n';
         cout << "|                San Antonio, Nueva Ecija                    |" << '\n';
         cout << "|                    +63902020202                            |" << '\n';
         cout << "+------------------------------------------------------------+" << '\n';
