@@ -1,11 +1,12 @@
-#include <iostream>
-#include <string>
+#include <chrono>
+#include <cstdlib>
 #include <ctime>
 #include <iomanip>
+#include <iostream>
+#include <regex>
 #include <sstream>
-#include <chrono>
+#include <string>
 #include <thread>
-#include <cstdlib>
 #include "order_system.h"
 
 constexpr int g_MAX_ORDERS = 15;
@@ -17,6 +18,8 @@ const string itemNames[] = {"Fries", "Coke", "Fried Chicken", "Ice Cream", "Menu
 constexpr int itemPrices[] = {30, 25, 60, 25, 60, 50, 85, 40, 70, 100, 70, 50, 60, 40, 10};
 int quantityAmount[g_MAX_ORDERS] = {};
 bool isCheckout = false;
+int g_idNumber;
+string className;
 
 using namespace std;
 
@@ -43,9 +46,8 @@ void printOrderItems()
     cout << "|                                                                                          |" << '\n';
     cout << "+------------------------------------------------------------------------------------------+" << '\n';
 }
-
 // Handle the order system
-void orderSystem(string orderMessage, bool &dine, bool &newOrder)
+void orderSystem(string orderMessage, bool &dine, bool &newOrder, bool &classStatus)
 {
     char prompt = 'Y';
     cout << orderMessage;
@@ -63,6 +65,103 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
             cin.ignore(100, '\n');
         }
 
+        string types[3] = {"PWD", "SENIOR CITIZEN", "NONE"};
+        bool typeMatch = false;
+
+        do
+        {
+            if (g_orderIndex == 0)
+            {
+                cout << "PWD or Senior Citizen (Enter None if applicable): ";
+                string classType;
+                getline(cin >> ws, classType);
+
+                // Convert input string to uppercase
+                for (char& c : classType)
+                {
+                    c = toupper(c);
+                }
+
+                // Check if the input matches any of the types
+
+                for (const string& type : types)
+                {
+                    if (type == classType)
+                    {
+                        typeMatch = true;
+
+                        if (type != "NONE")
+                        {
+                            cout << "Enter ID Number: ";
+                            string stringIdNumber;
+                            getline(cin >> ws, stringIdNumber);
+
+                            bool isError = false;
+
+                            do
+                            {
+                                if (!isValidInput(stringIdNumber) || stringIdNumber.length() < 6 || stringIdNumber.length() > 6)
+                                {
+                                    isError = true;
+                                    cout << "ID number invalid. Try again: ";
+                                    getline(cin >> ws, stringIdNumber);
+                                }
+                                else
+                                {
+                                    isError = false;
+                                }
+                            }
+                            while (isError);
+
+
+                            g_idNumber = stoi(stringIdNumber);
+
+                            do
+                            {
+                                cout << "Enter Full Name (FIRST/LAST): ";
+                                getline(cin >> ws, className);
+
+                                // Check if the input is valid
+                                bool isValid = true;
+                                for (char c : className)
+                                {
+                                    if (!isalpha(c) && c != ' ')
+                                    {
+                                        isValid = false;
+                                        break;
+                                    }
+                                }
+
+                                if (!isValid)
+                                {
+                                    cout << "Invalid Name. Try again\n";
+                                }
+                                else
+                                {
+                                    classStatus = true;
+                                    break; // Break out of the loop if the input is valid
+                                }
+                            }
+                            while (true);
+                        }
+                        else
+                        {
+                           break;
+                        }
+                    }
+                }
+                if (!typeMatch) {
+                    cout << "Invalid input! Please enter PWD or SENIOR CITIZEN.\n";
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        while (!typeMatch);
+
+
         // Check if the user selected dine-in option
 
         if (toupper(order) != 'T' && toupper(order) != 'D' && !newOrder)
@@ -79,21 +178,18 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
         (!dine && g_orderIndex == 0) ? cout << "TAKE OUT" : cout << "";
 
         cout << "\nWhat would you like to order? (1-15) ";
-        int item;
-        cin >> item;
-        cin.ignore(100, '\n');
-        int itemAmount = 0;
+        string choice;
+        getline(cin >> ws, choice);
 
         // Validate the user input
-        while (cin.fail() || item < 1 || item > 15)
+        while (!isValidInput(choice) || stof(choice) < 1 || stof(choice) > 15)
         {
             cout << "Invalid input! Please enter a number between 1 and 15.\n";
-            cin.clear();
-            cin.ignore(100, '\n');
             cout << "\n\nWhat would you like to order? (1-15) ";
-            cin >> item;
-            cin.ignore(100, '\n');
+            getline(cin >> ws, choice);
         }
+
+        int item = stoi(choice);
 
         // Calculate the total quantity of the selected item in the order
         int totalQuantity = 0;
@@ -114,21 +210,28 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
 
         cout << "You have ordered " << itemNames[item - 1] << '\n';
 
+        string amountChoice;
+        bool error = false;
         do
         {
             cout << "How many would you like? (cannot exceed more than 10 items) ";
-            cin >> itemAmount;
-            cin.ignore(100, '\n');
+            getline(cin >> ws, amountChoice);
 
             // Validate the quantity input
-            if (cin.fail() || itemAmount <= 0 || itemAmount > 10)
+            if (!isValidInput(amountChoice) || stof(amountChoice) <= 0 || stof(amountChoice) > 10)
             {
                 cout << "\nInvalid amount! Please enter a positive integer less than or equal to 10.\n";
-                cin.clear();
-                cin.ignore(100, '\n');
+                error = true;
             }
+            else
+            {
+                error = false;
+            }
+
         }
-        while (cin.fail() || itemAmount <= 0 || itemAmount > 10);
+        while (error);
+
+        int itemAmount = stoi(amountChoice);
 
         // Check if the total quantity exceeds the limit after adding the new quantity
         if (totalQuantity + itemAmount > 10)
@@ -137,9 +240,17 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
             do
             {
                 cout << "How many would you like? (cannot exceed more than 10 items) ";
-                cin.clear();
-                cin.ignore(100, '\n');
-                cin >> itemAmount;
+                string newAmountChoice;
+                getline(cin >> ws, newAmountChoice);
+
+                if (!isValidInput(newAmountChoice) || stoi(newAmountChoice) <= 0 || stoi(newAmountChoice) > 10)
+                {
+                    cout << "\nInvalid amount! Please enter a positive integer less than or equal to 10.\n";
+                }
+                else
+                {
+                    itemAmount = stoi(newAmountChoice);
+                }
             }
             while (totalQuantity + itemAmount > 10);
         }
@@ -179,6 +290,13 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder)
     }
 }
 
+bool isValidInput(const string& input)
+{
+    const regex choicePattern("^[0-9]+$");
+
+    return regex_match(input, choicePattern);
+}
+
 // Remove duplicate orders and update quantities and prices
 void checkDuplicate()
 {
@@ -209,19 +327,19 @@ void checkDuplicate()
 }
 
 // Display the current cart and calculate the total price
-void checkCart(int *priceSum)
+void checkCart(int &priceSum, bool &emptyCart)
 {
     // Remove duplicate orders and update quantities and prices
     checkDuplicate();
 
-    *priceSum = 0;
+    priceSum = 0;
 
     cout << '\n';
     cout << "+----------------------------------------------------------------+" << '\n';
     cout << "|                             CART                               |" << '\n';
     cout << "+----------------------------------------------------------------+" << '\n';
 
-    bool cartEmpty = true;
+    emptyCart = true;
 
     cout << "|No. | Qty | Item                           | Price   | Total    |" << '\n';
     cout << "+----+--------------------------------------+---------+----------+" << '\n';
@@ -237,18 +355,18 @@ void checkCart(int *priceSum)
                  << " | " << setw(30) << left << orderCart[i] << " | P" << setw(7)
                  << left << itemPrices[itemPriceIndex] << "| P" << setw(8) << left << price[i]  << "|" << '\n';
 
-            *priceSum += price[i];
-            cartEmpty = false;
+            priceSum += price[i];
+            emptyCart = false;
         }
     }
 
-    if (cartEmpty)
+    if (emptyCart)
     {
         cout << "|                     No items in cart                           |" << '\n';
     }
 
     cout << "+----------------------------------------------------------------+" << '\n';
-    cout << "| Total Price: P" << *priceSum << setw(50 - to_string(*priceSum).length()) << right << "|" << '\n';
+    cout << "| Total Price: P" << priceSum << setw(50 - to_string(priceSum).length()) << right << "|" << '\n';
     cout << "+----------------------------------------------------------------+" << '\n';
 
 }
@@ -268,16 +386,17 @@ int getItemPriceIndex(string itemName)
 void updateItem()
 {
     cout << "Enter Item Number: ";
-    int itemNumber;
-    cin >> itemNumber;
-    cin.ignore(100, '\n');
+    string choice;
+    getline(cin >> ws, choice);
 
     // Validate the item number
-    if (cin.fail() || itemNumber < 1 || itemNumber > g_orderIndex)
+    if (!isValidInput(choice) || stof(choice) < 1 || stof(choice) > g_orderIndex)
     {
         cout << "Invalid item number!\n";
         return;
     }
+
+    int itemNumber = stoi(choice);
 
     cout << "You have selected " << orderCart[itemNumber - 1] << '\n';
     cout << "+ (Add Item) or - (Subtract Item): ";
@@ -289,145 +408,192 @@ void updateItem()
     switch (quantityUpdate)
     {
     case '+':
+    {
+        int amountUpdate = 0;
+        bool error = false;
+
+        do
         {
             cout << "Enter quantity you want to add: ";
-            int amountUpdate;
-            cin >> amountUpdate;
+            string amountUpdateChoice;
+            getline(cin >> ws, amountUpdateChoice);
 
-            // Calculate the total quantity of the selected item
-            int totalQuantity = 0;
-            for (int i = 0; i < g_orderIndex; ++i)
-            {
-                if (orderCart[i] == itemNames[itemPriceIndex])
-                {
-                    totalQuantity += quantityAmount[i];
-                }
-            }
-
-            // Check if the total quantity exceeds the limit
-            if (totalQuantity >= 10)
-            {
-                cout << "You cannot order more than ten items of this type!" << '\n';
-                return;
-            }
-
-            if (totalQuantity + amountUpdate > 10)
-            {
-            cout << "You cannot order more than ten items of this type!\n";
-                do
-                {
-                    cout << "Enter quantity you want to add: ";
-                    cin.clear();
-                    cin.ignore(100, '\n');
-                    cin >> amountUpdate;
-                }
-                while (totalQuantity + amountUpdate > 10);
-            }
-
-
-            // Update the price and quantity
-            price[itemNumber - 1] += itemPrices[itemPriceIndex] * amountUpdate;
-            quantityAmount[itemNumber - 1] += amountUpdate;
-
-            // Validate the quantity input
-            if (cin.fail() || amountUpdate <= 0)
+            if (!isValidInput(amountUpdateChoice) || stof(amountUpdateChoice) <= 0)
             {
                 cout << "Invalid input! Please enter a positive integer.\n";
-                cin.clear();
-                cin.ignore(100, '\n');
-                return;
+                error = true;
             }
-
-            break;
+            else
+            {
+                amountUpdate = stoi(amountUpdateChoice);
+                error = false;
+            }
         }
+        while (error);
+
+        // Calculate the total quantity of the selected item
+        int totalQuantity = 0;
+        for (int i = 0; i < g_orderIndex; ++i)
+        {
+            if (orderCart[i] == itemNames[itemPriceIndex])
+            {
+                totalQuantity += quantityAmount[i];
+            }
+        }
+
+        // Check if the total quantity exceeds the limit
+        if (totalQuantity >= 10)
+        {
+            cout << "You cannot order more than ten items of this type!" << '\n';
+            return;
+        }
+
+        if (totalQuantity + amountUpdate > 10)
+        {
+            cout << "You cannot order more than ten items of this type!\n";
+            string newAmountUpdateChoice;
+            do
+            {
+                cout << "Enter quantity you want to add: ";
+                getline(cin >> ws, newAmountUpdateChoice);
+
+                // Validate the quantity input
+                if (!isValidInput(newAmountUpdateChoice) || stof(newAmountUpdateChoice) <= 0)
+                {
+                    cout << "Invalid input! Please enter a positive integer.\n";
+                    continue;
+                }
+                amountUpdate = stoi(newAmountUpdateChoice);
+
+                // Check if the new amount update still exceeds the limit
+                if (totalQuantity + amountUpdate <= 10)
+                {
+                    break;
+                }
+
+                cout << "You cannot order more than ten items of this type!\n";
+            }
+            while (true);
+        }
+
+        // Update the price and quantity
+        price[itemNumber - 1] += itemPrices[itemPriceIndex] * amountUpdate;
+        quantityAmount[itemNumber - 1] += amountUpdate;
+
+        break;
+    }
     case '-':
+    {
+        int amountMinus = 0;
+        bool error = false;
+
+        do
         {
             cout << "Enter quantity you want to remove: ";
-            int amountMinus;
-            cin.ignore(100, '\n');
-            cin >> amountMinus;
+            string amountMinusChoice;
+            getline(cin >> ws, amountMinusChoice);
 
-            // Validate the quantity input
-           if (cin.fail() || amountMinus <= 0)
+            if (!isValidInput(amountMinusChoice) || stof(amountMinusChoice) <= 0 || stof(amountMinusChoice) > quantityAmount[itemNumber - 1])
             {
-                cout << "Invalid input! Please enter a positive integer.\n";
-                cin.clear();
-                cin.ignore(100, '\n');
-                return;
+                cout << "Invalid input! Please enter a valid input.\n";
+                error = true;
             }
-
-            // Update the price and quantity
-            price[itemNumber - 1] -= itemPrices[itemPriceIndex] * amountMinus;
-            quantityAmount[itemNumber - 1] -= amountMinus;
-
-            // If the quantity becomes zero, remove the order
-            if (quantityAmount[itemNumber - 1] == 0)
+            else
             {
-                for (int i = itemNumber - 1; i < g_orderIndex - 1; ++i)
-                {
-                    orderCart[i] = orderCart[i + 1];
-                    quantityAmount[i] = quantityAmount[i + 1];
-                    price[i] = price[i + 1];
-                }
-                orderCart[g_orderIndex - 1] = "";
-                quantityAmount[g_orderIndex - 1] = 0;
-                price[g_orderIndex - 1] = 0;
-                g_orderIndex--;
+                amountMinus = stoi(amountMinusChoice);
+                error = false;
             }
-            break;
         }
+        while (error);
+
+        // Update the price and quantity
+        price[itemNumber - 1] -= itemPrices[itemPriceIndex] * amountMinus;
+        quantityAmount[itemNumber - 1] -= amountMinus;
+
+        // If the quantity becomes zero, remove the order
+        if (quantityAmount[itemNumber - 1] == 0)
+        {
+            for (int i = itemNumber - 1; i < g_orderIndex - 1; ++i)
+            {
+                orderCart[i] = orderCart[i + 1];
+                quantityAmount[i] = quantityAmount[i + 1];
+                price[i] = price[i + 1];
+            }
+            orderCart[g_orderIndex - 1] = "";
+            quantityAmount[g_orderIndex - 1] = 0;
+            price[g_orderIndex - 1] = 0;
+            g_orderIndex--;
+        }
+        break;
+    }
     default:
         cout << "Invalid option!" << '\n';
         return;
     }
 }
-
 // Delete an existing order
-void deleteItem()
+void deleteItem(bool &emptyCart)
 {
-    cout << "Enter Item Number: ";
-    int itemNumber;
-    cin >> itemNumber;
-    cin.ignore(100, '\n');
+    string choice;
 
-    // Validate the item number
-    if (cin.fail() || itemNumber < 1 || itemNumber > g_orderIndex)
-    {
-        cout << "Invalid item number!" << '\n';
-        return;
-    }
-
-    cout << "You have selected " << orderCart[itemNumber - 1] << '\n';
-    cout << "Are you sure you want to delete this item? (Y/N) ";
-    char deleteCart;
-    cin >> deleteCart;
-
-    // Delete the order if the user confirms
-    if (toupper(deleteCart) != 'N')
-    {
-        for (int i = itemNumber - 1; i < g_orderIndex - 1; ++i)
+   if (!emptyCart)
+   {
+        do
         {
-            orderCart[i] = orderCart[i + 1];
-            quantityAmount[i] = quantityAmount[i + 1];
-            price[i] = price[i + 1];
-        }
-        orderCart[g_orderIndex - 1] = "";
-        quantityAmount[g_orderIndex - 1] = 0;
-        price[g_orderIndex - 1] = 0;
-        g_orderIndex--;
+            cout << "Enter Item Number: ";
+            getline(cin >> ws, choice);
 
-        cout << "Order deleted successfully!" << '\n';
+            // Validate the item number
+            if (!isValidInput(choice) || stof(choice) < 1 || stof(choice) > g_orderIndex)
+            {
+                cout << "Invalid item number!" << '\n';
+            }
+            else
+            {
+                break;
+            }
+        }
+        while (true);
+
+
+        int itemNumber = stoi(choice);
+
+        cout << "You have selected " << orderCart[itemNumber - 1] << '\n';
+        cout << "Are you sure you want to delete this item? (Y/N) ";
+        char deleteCart;
+        cin >> deleteCart;
+
+        // Delete the order if the user confirms
+        if (toupper(deleteCart) != 'N')
+        {
+            for (int i = itemNumber - 1; i < g_orderIndex - 1; ++i)
+            {
+                orderCart[i] = orderCart[i + 1];
+                quantityAmount[i] = quantityAmount[i + 1];
+                price[i] = price[i + 1];
+            }
+            orderCart[g_orderIndex - 1] = "";
+            quantityAmount[g_orderIndex - 1] = 0;
+            price[g_orderIndex - 1] = 0;
+            g_orderIndex--;
+
+            cout << "Order deleted successfully!" << '\n';
+        }
+        else
+        {
+            cout << "Deletion canceled" << '\n';
+        }
     }
     else
     {
-        cout << "Deletion canceled" << '\n';
+        cout << "\nYou do not have any items in your cart!" << '\n';
     }
 }
 
 // Ask the user if they want to check out
 bool askCheckout()
 {
-    cout << "\nWould you like to check out? ((Y/N) ";
+    cout << "\nWould you like to check out? (Y/N) ";
     char decision;
     cin >> decision;
 
@@ -453,37 +619,46 @@ int dropOrders()
 }
 
 // Handle the checkout process
-void checkout(int *money, int *priceSum)
+void checkout(int &money, int &priceSum, bool &isDine, bool &newOrder, bool &cartFlag, bool &classStatus)
 {
-    if (*priceSum != 0)
+    if (priceSum != 0)
     {
-        cout << "\nPayment (Cash): ";
-        cin >> *money;
-        cin.ignore(100, '\n');
+        string paymentInput;
+        bool error = false;
 
-        // Validate the payment input
-        while (cin.fail() || *money < 0)
+        do
         {
-            cout << "Invalid input! Please enter a positive number.\n";
-            cin.clear();
-            cin.ignore(100, '\n');
             cout << "\nPayment (Cash): ";
-            cin >> *money;
-            cin.ignore(100, '\n');
+            getline(cin >> ws, paymentInput);
+
+            // Validate the payment input
+            if (!isValidInput(paymentInput) || stoi(paymentInput) < 0)
+            {
+                cout << "Invalid input! Please enter a valid integer.\n";
+                error = true;
+            }
+            else
+            {
+                money = stoi(paymentInput);
+                error = false;
+            }
         }
+        while (error);
 
         // Check if the payment is sufficient
-        if (*money < *priceSum)
+        if (money < priceSum)
         {
             cout << "You do not have enough cash!"
                  << "\nCancel order? (Y/N) ";
             char continueOrder;
             cin >> continueOrder;
-            if (toupper(continueOrder) != 'Y')
+            cin.ignore(100, '\n');
+            if (toupper(continueOrder) == 'N')
             {
-                checkout(money, priceSum);
+              handleOrderModification(priceSum, isDine, newOrder, cartFlag, classStatus);
+              askCheckout();
             }
-            else
+            else if (toupper(continueOrder) == 'Y')
             {
                 dropOrders();
             }
@@ -510,7 +685,7 @@ string getCurrentDateTime()
 }
 
 // Print the receipt
-void printReceipt(int *money, bool &dine)
+void printReceipt(int &money, bool &dine, bool &classStatus)
 {
     // Array of cashier names
     const string cashierNames[] = {"Jannel", "Amiel", "Justine", "Jairo",
@@ -558,8 +733,8 @@ void printReceipt(int *money, bool &dine)
         cout << "|                            Vatable Sales: P" << fixed << setprecision(2) << setw(8) << right << vatSales << "        |" << '\n';
         cout << "|                            VAT (12%):     P" << setw(8) << right << VAT_tax << "        |" << '\n';
         cout << "|                            TOTAL:         P" << setw(8) << right << fixed << setprecision(2) << static_cast<double>(totalAmount) << "        |" << '\n';
-        cout << "|                            CASH:          P" << setw(8) << right << fixed << setprecision(2) << static_cast<double>(*money) << "        |" << '\n';
-        cout << "|                            CHANGE:        P" << setw(8) << right << fixed << setprecision(2) << static_cast<double>(*money - totalAmount) << "        |" << '\n';
+        cout << "|                            CASH:          P" << setw(8) << right << fixed << setprecision(2) << static_cast<double>(money) << "        |" << '\n';
+        cout << "|                            CHANGE:        P" << setw(8) << right << fixed << setprecision(2) << static_cast<double>(money - totalAmount) << "        |" << '\n';
         cout << "+------------------------------------------------------------+" << '\n';
 
         cout << "|                                                            |" << '\n';
@@ -572,8 +747,7 @@ void printReceipt(int *money, bool &dine)
         }
         // Include cashier name in the receipt
         cout << "|  Sold by: " << setw(49) << left << cashierName << "|" << '\n';
-        cout << "|  Sold to: _________________________                        |" << '\n';
-        cout << "|  Name: ____________________________                        |" << '\n';
+        cout << "|  Name: " << setw(52) << left << (classStatus ? className :  "_________________________    ") << "|" << '\n';
         cout << "|  Address: _________________________                        |" << '\n';
         cout << "|  TIN: _____________________________                        |" << '\n';
         for (int i = 0; i < 4; i++)
@@ -586,10 +760,10 @@ void printReceipt(int *money, bool &dine)
 }
 
 
-void directCheckout(int *money, int *priceSum, bool &dine)
+void directCheckout(int &money, int &priceSum, bool &dine, bool &newOrder, bool &cartFlag, bool &classStatus)
 {
-    checkout(money, priceSum);
-    printReceipt(money, dine);
+    checkout(money, priceSum, dine, newOrder, cartFlag, classStatus);
+    printReceipt(money, dine, classStatus);
     cout << "Thank you for coming to Ardee's. Please come again" << '\n';
     cout << "\nPress Enter to exit...";
     cin.ignore();
@@ -606,3 +780,82 @@ void exitSystem()
     }
     cout << '\n';
 }
+
+void handleOrderModification(int &priceSum, bool &isDine, bool &newOrder, bool &cartFlag, bool &classStatus)
+{
+    char orderPrompt = 'Y';
+    bool modify = false;
+
+    // Loop to allow order modification
+    while (toupper(orderPrompt) != 'N')
+    {
+        cout << "Do you want to modify your existing orders? (Y/N) ";
+        cin >> orderPrompt;
+        cin.ignore(100, '\n');
+
+        // If the user wants to modify the order
+        if (toupper(orderPrompt) != 'N')
+        {
+            modify = true;
+        }
+        else
+        {
+            break; // Exit the loop if the user doesn't want to modify the order
+        }
+
+        // If modification is requested
+        while (modify)
+        {
+            // Print options for modification
+            cout << "\n(1) Delete Item"
+                 << "\n(2) Update Item"
+                 << "\n(3) Order Again"
+                 << "\n(4) Go Back \n>> ";
+
+            int option;
+            cin >> option;
+
+            while (cin.fail())
+            {
+                cin.clear();
+                cin.ignore(100, '\n');
+                option = 5;
+            }
+
+            // Handle the selected option
+            switch (option)
+            {
+                case 1:
+                    deleteItem(cartFlag); // Delete an existing order
+                    modify = false;
+                    break;
+                case 2:
+                    updateItem(); // Update the quantity of an existing order
+                    modify = false;
+                    break;
+                case 3:
+                    newOrder = true;     // Set the flag to indicate it's a new order
+                    printOrderItems();   // Print the menu of available items
+                    orderSystem("", isDine, newOrder, classStatus); // Start the order system with the "ordering again" message
+                    modify = false;
+                    break;
+                case 4:
+                    checkCart(priceSum, cartFlag);
+                    orderPrompt = 'N';
+                    modify = false;
+                    break;
+                default:
+                    cout << "Invalid option! Select again\n"; // Print an error message for invalid input
+                    continue;                               // Continue the loop to allow the user to select again
+            }
+
+            // Display the updated cart and total price
+            if (option != 4)
+            {
+                checkCart(priceSum, cartFlag);
+                continue; // Continue the loop to allow further modifications
+            }
+        }
+    }
+}
+
