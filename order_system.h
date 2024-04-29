@@ -10,6 +10,7 @@
 
 using namespace std;
 
+void displayCenteredAsciiArt();
 void printOrderItems();
 void orderSystem(string orderMessage, bool &dine, bool &newOrder, bool &classStatus);
 bool isValidInput(const string& input);

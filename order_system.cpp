@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <thread>
+#include <windows.h>
 #include "order_system.h"
 
 constexpr int g_MAX_ORDERS = 15;
@@ -22,6 +23,47 @@ int g_idNumber;
 string className;
 
 using namespace std;
+
+int getConsoleHeight()
+{
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    return csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+}
+
+// Function to display centered ASCII art
+void displayCenteredAsciiArt()
+{
+    const string art[] = {
+        "                   _           _     ",
+        "     /\\           | |         ( )    ",
+        "    /  \\   _ __ __| | ___  ___|/ ___ ",
+        "   / /\\ \\ | '__/ _` |/ _ \\/ _ \\ / __|",
+        "  / ____ \\| | | (_| |  __/  __/ \\__ \\",
+        " /_/    \\_\\_|  \\__,_|\\___|\\___| |___/"
+    };
+
+    int consoleHeight = getConsoleHeight();
+    int artHeight = static_cast<int>(sizeof(art) / sizeof(art[0]));
+    int startLine = (consoleHeight - artHeight) / 2;
+
+    for (int i = 0; i < startLine; ++i)
+    {
+        cout << endl;
+    }
+
+    for (const string& line : art)
+    {
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+        int consoleWidth = csbi.dwSize.X;
+        int indent = (consoleWidth - line.length()) / 2;
+        cout << setw(indent) << "" << line << endl;
+    }
+
+
+}
+
 
 // Print the hardcoded menu of available items
 void printOrderItems()

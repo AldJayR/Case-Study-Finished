@@ -17,6 +17,11 @@ int main()
     bool cartFlag = true;
     bool classStatus = false;
 
+    displayCenteredAsciiArt();
+    cout << "\n\t\t\t\t\t\t";
+    system("pause");
+    system("CLS");
+
     // Print the menu of available items
     printOrderItems();
 
