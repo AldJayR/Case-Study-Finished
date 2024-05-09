@@ -8,6 +8,7 @@
 #include <string>
 #include <thread>
 #include <windows.h>
+#include <fstream>
 #include "order_system.h"
 
 constexpr int g_MAX_ORDERS = 15;
@@ -226,7 +227,7 @@ void orderSystem(string orderMessage, bool &dine, bool &newOrder, bool &classSta
         // Validate the user input
         while (!isValidInput(choice) || stof(choice) < 1 || stof(choice) > 15)
         {
-            cout << "Invalid input! Please enter a number between 1 and 15.\n";
+            cout << "Invalid input! Please enter an integer between 1 and 15.\n";
             cout << "\n\nWhat would you like to order? (1-15) ";
             getline(cin >> ws, choice);
         }
@@ -659,6 +660,24 @@ int dropOrders()
 
     return 1;
 }
+void saveOrdersToCSV()
+{
+    ofstream outputFile("orders.csv");
+    if (outputFile.is_open())
+    {
+        outputFile << "Order ID,Item Name,Quantity,Price\n";
+        for (int i = 0; i < g_orderIndex; ++i)
+        {
+            outputFile << i + 1 << "," << orderCart[i] << "," << quantityAmount[i] << "," << price[i] << "\n";
+        }
+        outputFile.close();
+        cout << "Orders saved to orders.csv\n";
+    }
+    else
+    {
+        cout << "Unable to open file for writing\n";
+    }
+}
 
 // Handle the checkout process
 void checkout(int &money, int &priceSum, bool &isDine, bool &newOrder, bool &cartFlag, bool &classStatus)
@@ -690,7 +709,7 @@ void checkout(int &money, int &priceSum, bool &isDine, bool &newOrder, bool &car
         // Check if the payment is sufficient
         if (money < priceSum)
         {
-            cout << "You do not have enough cash!"
+            cout << "Insufficient funds."
                  << "\nCancel order? (Y/N) ";
             char continueOrder;
             cin >> continueOrder;
@@ -708,11 +727,13 @@ void checkout(int &money, int &priceSum, bool &isDine, bool &newOrder, bool &car
         else
         {
             isCheckout = true;
+            saveOrdersToCSV();
+
         }
     }
     else
     {
-        cout << "\nYou do not have enough items in your cart!" << '\n';
+        cout << "\nYou do not have enough items in your cart." << '\n';
     }
 }
 

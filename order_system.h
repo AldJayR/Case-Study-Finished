@@ -21,6 +21,7 @@ void updateItem();
 void deleteItem(bool &emptyCart);
 bool askCheckout();
 int dropOrders();
+void saveOrdersToCSV();
 void checkout(int &money, int &priceSum, bool &isDine, bool &newOrder, bool &cartFlag, bool &classStatus);
 string getCurrentDateTime();
 void printReceipt(int &money, bool &dine, bool &classStatus);
